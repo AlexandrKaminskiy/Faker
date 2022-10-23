@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace UnitTests.TestClasses
+{
+    public class NormalClassA
+    {
+        public string Name { get; set; }
+        public NormalClassA()
+        {
+            Name = "123";
+        }
+    }
+}
