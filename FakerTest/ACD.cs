@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 
 namespace UnitTests.TestClasses
 {
-    public class NormalClassA
+    public class ACD
     {
-        public string Name { get; set; }
-        public NormalClassA()
-        {
-            Name = "123";
-        }
+        public int PublicNumber { get; set; }
+        public BCD BLink { get; set; }
     }
 }

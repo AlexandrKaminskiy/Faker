@@ -4,28 +4,20 @@ using UnitTests.TestClasses;
 
 namespace UnitTests
 {
-    public class CreateDefaultClasses
+    public class DefaultFakerTest
     {
         private Faker.Faker _faker = new Faker.Faker();
         [Fact]
         public void CreateDefaultClass()
         {
-            //Arrange
-
-            //Act
-            var temp = _faker.Create<NormalClassA>();
-            //Assert
+            var temp = _faker.Create<A>();
             Assert.NotNull(temp);
         }
         
         [Fact]
         public void CreateInsertedClass()
         {
-            //Arrange
-
-            //Act
-            var temp = _faker.Create<NormalClassB>();
-            //Assert
+            var temp = _faker.Create<B>();
             Assert.NotNull(temp);
         }
     }

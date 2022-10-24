@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace UnitTests.TestClasses
 {
-    public class NormalClassB
+    public class BCD
     {
-        public NormalClassA ALink { get; set; }
+        public int PublicNumberB { get; set; }
+        public ACD ALink { get; set; }
     }
 }

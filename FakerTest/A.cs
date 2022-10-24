@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace UnitTests.TestClasses
 {
-    public class ClassWithValueList
+    public class A
     {
-        public List<int> Numbers { get; set; }
-        public ClassWithValueList()
+        public string Name { get; set; }
+        public A()
         {
-            Numbers = new List<int>();
+            Name = "123";
         }
     }
 }

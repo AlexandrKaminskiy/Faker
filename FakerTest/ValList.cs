@@ -6,9 +6,12 @@ using System.Threading.Tasks;
 
 namespace UnitTests.TestClasses
 {
-    public class ACycle
+    public class ValList
     {
-        public int PublicNumber { get; set; }
-        public BCycle BLink { get; set; }
+        public List<int> Numbers { get; set; }
+        public ValList()
+        {
+            Numbers = new List<int>();
+        }
     }
 }

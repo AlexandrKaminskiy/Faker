@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace UnitTests.TestClasses
 {
-    public class ClassWithRefList
+    public class AList
     {
-        public List<NormalClassA> Smth { get; set; }
+        public List<A> Smth { get; set; }
     }
 }
