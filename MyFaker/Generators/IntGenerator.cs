@@ -5,7 +5,7 @@ public class IntGenerator: IGenerator
 {
     public object Generate()
     {
-        return new Random().Next() % 1000;
+        return new Random().Next();
     }
 
     public Type GetGeneratedType()

@@ -11,7 +11,7 @@ namespace Faker.Generators
     {
         public object Generate()
         {
-            return new Random().NextDouble() % 1000 * 0.12;
+            return new Random().NextDouble() * 10000;
         }
 
         public Type GetGeneratedType()

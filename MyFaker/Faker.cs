@@ -1,4 +1,5 @@
 ﻿using Faker.Interfaces;
+using MyFaker;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -9,93 +10,79 @@ namespace Faker
 {
     public class Faker : IFaker
     {
-        private DefaultGenerator _generator = new DefaultGenerator();
-        private List<Type> _stackTypes;
+        private DefaultGenerator defaultGenerator;
+        private List<Type> createdUserTypes;
         public T Create<T>()
         {
-            _stackTypes = new List<Type>();
-            return (T)CreateDto(typeof(T));
+            defaultGenerator = new DefaultGenerator();
+            createdUserTypes = new List<Type>();
+            return (T) CreateDto(typeof(T));
         }
         private object CreateDto(Type type)
         {
             bool isSystem = false;
-            if(_generator.IsConsistGenerator(type))
+            if(defaultGenerator.hasGenerator(type))
             {
                 isSystem = true;
-                return _generator.Generate(type)!;
+                return defaultGenerator.Generate(type)!;
             }
             if (type.IsGenericType)
             {
                 isSystem = true;
-                var generic = (IList) Activator.CreateInstance(type);
-                var genericItemsType = type.GetGenericArguments()[0];
-                for(int i = 0; i < 2; i++)
-                {
-                    var itemObj = CreateDto(genericItemsType);
-                    generic.Add(itemObj);
-                }
-                return generic;
+                var collection = (IList) Activator.CreateInstance(type);
+                var collectionParametrizedType = type.GetGenericArguments()[0];
+                collection.Add(CreateDto(collectionParametrizedType));
+                collection.Add(CreateDto(collectionParametrizedType));
+                return collection;
             }
-            if (!_stackTypes.Contains(type))
+            if (!createdUserTypes.Contains(type))
             {
                 if (!isSystem)
                 {
-                    _stackTypes.Add(type);
+                    createdUserTypes.Add(type);
                 }
                 var createdObj = CreateObject(type);
                 InitializePropsAndFields(createdObj);
-                _stackTypes.Remove(type);
+                createdUserTypes.Remove(type);
                 return createdObj;
-            }
-            else
-            {
-                //if exist cyclic dependency 
-                throw new Exception("exist cyclic dependency");
-            }
+            }    
+            throw new CyclicException();
         }
 
         private void InitializePropsAndFields(object obj)
         {
-            var props = obj.GetType().GetProperties();
-            var fields = obj.GetType().GetFields(BindingFlags.Public | BindingFlags.Static |
-               BindingFlags.Instance);
+            var properties = obj.GetType().GetProperties();
+            var fields = obj.GetType().GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.Instance);
             foreach (var field in fields)
             {
                 var fd = CreateDto(field.FieldType);
                 field.SetValue(obj, fd);
             }
-            foreach (var prop in props)
+            foreach (var property in properties)
             {
-                if (prop.CanWrite)
+                if (property.CanWrite)
                 {
-                    var pr = CreateDto(prop.PropertyType);
-                    prop.SetValue(obj, pr);
+                    var pr = CreateDto(property.PropertyType);
+                    property.SetValue(obj, pr);
                 }
-               
             }
         }
-
-        private object CreateObject(Type type)
-        {
-            var ctor = GetConstructorWithMinParameters(type);
-            if(ctor == null)
-            {
-                return CreateObject(type);
-            }
-            var ctorParams = ctor.GetParameters();
-            var paramsList = new List<object>(); 
-            foreach(var param in ctorParams)
-            {
-                paramsList.Add(CreateDto(param.ParameterType));
-            }
-            return ctor.Invoke(paramsList.ToArray());
-        }
-
-        private ConstructorInfo? GetConstructorWithMinParameters(Type type)
+        private ConstructorInfo GetConstructor(Type type)
         {
             var constructors = type.GetConstructors();
-            var ctor = constructors.OrderBy(c=>c.GetParameters().Length).FirstOrDefault();
-            return ctor;
+            var constructor = constructors.OrderBy(c => c.GetParameters().Length).FirstOrDefault();
+            return constructor;
+        }
+        private object CreateObject(Type type)
+        {
+            var constructor = GetConstructor(type);
+            var constructorParametrs = constructor.GetParameters();
+            var paramsList = new List<object>(); 
+            foreach(var parameter in constructorParametrs)
+            {
+                paramsList.Add(CreateDto(parameter.ParameterType));
+            }
+            return constructor.Invoke(paramsList.ToArray());
         }
     }
 }

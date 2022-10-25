@@ -12,46 +12,46 @@ namespace Faker
 {
     public class DefaultGenerator
     {
-        private Dictionary<Type, IGenerator> _generators = new Dictionary<Type, IGenerator>();
-
+        private Dictionary<Type, IGenerator> valueGenerateDictionary = new Dictionary<Type, IGenerator>();
+        public bool hasGenerator(Type type)
+        {
+            return valueGenerateDictionary.ContainsKey(type);
+        }
+        public object Generate(Type type)
+        {
+            if (hasGenerator(type))
+            {
+                return valueGenerateDictionary[type].Generate();
+            }
+            return null;
+        }
         public DefaultGenerator()
         {
-            _generators.Add(typeof(int), new IntGenerator());
-            _generators.Add(typeof(double), new DoubleGenerator());
-            _generators.Add(typeof(DateTime), new DateGenerator());
-            _generators.Add(typeof(bool), new BoolGenerator());
-
-            SetGeneratorsFromPlugins();
+            valueGenerateDictionary.Add(typeof(int), new IntGenerator());
+            valueGenerateDictionary.Add(typeof(double), new DoubleGenerator());
+            valueGenerateDictionary.Add(typeof(DateTime), new DateGenerator());
+            valueGenerateDictionary.Add(typeof(bool), new BoolGenerator());
+            AddPluginGenerators();
         }
 
-        private void SetGeneratorsFromPlugins()
+        private void AddPluginGenerators()
         {
-            string pathToAdvancedGeneratorsDll = Path.Combine(Directory.GetCurrentDirectory(), "..\\..\\..\\..\\");
-            string[] allDll = Directory.GetFiles(pathToAdvancedGeneratorsDll, "*.dll");
-            foreach (string dllPath in allDll)
+            string path = Path.Combine(Directory.GetCurrentDirectory(), "..\\..\\..\\..\\");
+            string[] dlls = Directory.GetFiles(path, "*.dll");
+            foreach (string dll in dlls)
             {
-                Assembly asm = Assembly.LoadFrom(dllPath);
-                foreach (Type type in asm.GetExportedTypes())
+                Assembly asm = Assembly.LoadFrom(dll);
+                foreach (var type in asm.GetExportedTypes())
                 {
                     if (type.IsClass && typeof(IGenerator).IsAssignableFrom(type))
                     {
                         IGenerator generator = (IGenerator)Activator.CreateInstance(type);
-                        _generators.Add(generator.GetGeneratedType(), generator);
+                        valueGenerateDictionary.Add(generator.GetGeneratedType(), generator);
                     }
                 }
             }
         }
-        public bool IsConsistGenerator(Type type)
-        {
-            return _generators.ContainsKey(type);
-        }
-        public object? Generate(Type type)
-        {
-            if (IsConsistGenerator(type))
-                return _generators[type].Generate();
-            else
-                return null;
-        }
+
 
     }
 }

@@ -2,6 +2,7 @@
 using Faker.Interfaces;
 using UnitTests.TestClasses;
 using System;
+using MyFaker;
 
 namespace UnitTests
 {
@@ -12,7 +13,7 @@ namespace UnitTests
         [Fact]
         public void CyclicDependencies()
         {
-            Assert.Throws<Exception>(() => _faker.Create<ACD>());
+            Assert.Throws<CyclicException>(() => _faker.Create<ACD>());
         }
     }
 }
